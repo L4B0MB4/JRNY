@@ -1,19 +1,22 @@
 package main
 
 import (
+	"context"
+	"net/http"
+	"time"
+
+	"github.com/L4B0MB4/JRNY/jrny/models"
+	"github.com/L4B0MB4/JRNY/jrny/pool"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 )
 
-type Model struct {
-	Name string `json:"name" binding:"required"`
-}
 type InternalServerError struct {
 	Error string `json:"error"`
 }
 
 func onRequest(c *gin.Context) {
-	var model Model
+	var model models.Event
 	err := c.ShouldBindBodyWithJSON(&model)
 	if err != nil {
 		log.Err(err)
@@ -24,15 +27,34 @@ func onRequest(c *gin.Context) {
 		return
 
 	}
-	c.Status(201)
 
-	log.Debug().Str("method", c.Request.Method).Str("path", c.Request.RequestURI).Interface("body", model).Msg("On Request")
+	eventPool.Enqueue(&model)
+
+	c.Status(201)
+	//log.Debug().Str("method", c.Request.Method).Str("path", c.Request.RequestURI).Interface("body", model).Msg("On Request")
 }
 
+var eventPool = pool.EventPool{}
+
 func main() {
+	eventPool.Initialize()
 
 	router := gin.Default()
 	router.POST("/api/event", onRequest)
-	router.Run(":8080")
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
+	go func() {
+		// service connections
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatal().Err(err).Msg("error starting server")
+		}
+	}()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*100)
+	defer cancel()
+	time.Sleep(time.Second * 10)
+	eventPool.Shutdown()
+	srv.Shutdown(ctx)
 
 }
