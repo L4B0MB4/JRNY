@@ -38,6 +38,7 @@ func (e *EventPool) Shutdown() {
 	close(e.queue)
 }
 
+// Takes validated event models and enqueues them into the pool
 func (e *EventPool) Enqueue(event *models.Event) error {
 	err := e.queueInitializedGuard()
 	if err != nil {
