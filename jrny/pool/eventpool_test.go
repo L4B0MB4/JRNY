@@ -27,7 +27,3 @@ func TestInitializedQueue(t *testing.T) {
 	}
 
 }
-
-func TestFailing(t *testing.T) {
-	t.Error("failing test")
-}
