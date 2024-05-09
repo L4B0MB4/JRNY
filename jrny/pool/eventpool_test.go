@@ -12,7 +12,7 @@ func TestUnInitializedQueue(t *testing.T) {
 	err := ep.Enqueue(&models.Event{})
 
 	if err == nil {
-		t.Error("no error for unitialized eventpool")
+		t.Error("no error for uninitialized eventpool")
 	}
 
 }
@@ -23,7 +23,19 @@ func TestInitializedQueue(t *testing.T) {
 	err := ep.Enqueue(&models.Event{})
 
 	if err != nil {
-		t.Error("error for initialzed eventpool")
+		t.Error("error for initialized eventpool")
+	}
+
+}
+func TestDoubleInitializedQueue(t *testing.T) {
+	ep := pool.EventPool{}
+	err := ep.Initialize()
+	if err != nil {
+		t.Error("error for uninitialized eventpool after initialize")
+	}
+	err = ep.Initialize()
+	if err == nil {
+		t.Error("no error for already initialized eventpool")
 	}
 
 }
