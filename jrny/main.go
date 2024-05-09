@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/L4B0MB4/JRNY/jrny/models"
 	"github.com/L4B0MB4/JRNY/jrny/pool"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -27,18 +29,15 @@ func onRequest(c *gin.Context) {
 		return
 
 	}
-
 	eventPool.Enqueue(&model)
-
 	c.Status(201)
-	//log.Debug().Str("method", c.Request.Method).Str("path", c.Request.RequestURI).Interface("body", model).Msg("On Request")
 }
 
 var eventPool = pool.EventPool{}
 
 func main() {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	eventPool.Initialize()
-
 	router := gin.Default()
 	router.POST("/api/event", onRequest)
 	srv := &http.Server{
@@ -46,7 +45,6 @@ func main() {
 		Handler: router,
 	}
 	go func() {
-		// service connections
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal().Err(err).Msg("error starting server")
 		}
