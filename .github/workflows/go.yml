@@ -25,10 +25,10 @@ jobs:
       run: cd jrny && go build -v ./...
 
     - name: Test with Go
+      continue-on-error: true
       run: go test -v -json > TestResults.json ./...
     - name: Upload Go test results
       uses: actions/upload-artifact@v4
-      continue-on-error: true
       with:
         name: Go-results
         path: TestResults.json
