@@ -37,7 +37,9 @@ var eventPool = pool.EventPool{}
 
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	eventPool.Initialize()
+	ctx, cancel := context.WithCancel(context.Background())
+	factory := &pool.DefaultEventPoolWorkerFactory{}
+	eventPool.Initialize(factory, ctx)
 	router := gin.Default()
 	router.POST("/api/event", onRequest)
 	srv := &http.Server{
@@ -49,10 +51,8 @@ func main() {
 			log.Fatal().Err(err).Msg("error starting server")
 		}
 	}()
-	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*100)
 	defer cancel()
 	time.Sleep(time.Second * 10)
-	eventPool.Shutdown()
 	srv.Shutdown(ctx)
 
 }
