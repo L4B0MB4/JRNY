@@ -43,7 +43,7 @@ func (e *EventPool) onCancel(ctx context.Context) {
 	<-ctx.Done()
 	ctxerr := ctx.Err()
 	if ctxerr == context.Canceled {
-		log.Debug().Msg("Context was ")
+		log.Debug().Msg("Context was canceled")
 	} else {
 		log.Error().Msg("Unexpected context cancelation error")
 	}

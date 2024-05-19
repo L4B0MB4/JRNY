@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 	"os"
-	"time"
+	"os/signal"
 
 	"github.com/L4B0MB4/JRNY/jrny/models"
 	"github.com/L4B0MB4/JRNY/jrny/pool"
@@ -36,6 +36,8 @@ func onRequest(c *gin.Context) {
 var eventPool = pool.EventPool{}
 
 func main() {
+	signalCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	ctx, cancel := context.WithCancel(context.Background())
 	factory := &pool.DefaultEventPoolWorkerFactory{}
@@ -52,7 +54,11 @@ func main() {
 		}
 	}()
 	defer cancel()
-	time.Sleep(time.Second * 10)
+	select {
+	case <-signalCtx.Done():
+	}
+	log.Debug().Msg("Shutting down ...")
+	cancel()
 	srv.Shutdown(ctx)
 
 }
