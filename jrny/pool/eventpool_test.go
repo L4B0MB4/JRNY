@@ -9,6 +9,7 @@ import (
 )
 
 func TestUnInitializedQueue(t *testing.T) {
+	t.Log("Running TestUnInitializedQueue")
 	ep := pool.EventPool{}
 	err := ep.Enqueue(&models.Event{})
 	if err == nil {
@@ -18,6 +19,7 @@ func TestUnInitializedQueue(t *testing.T) {
 }
 
 func TestInitializedQueue(t *testing.T) {
+	t.Log("Running TestInitializedQueue")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	ep := pool.EventPool{}
@@ -31,6 +33,7 @@ func TestInitializedQueue(t *testing.T) {
 
 }
 func TestDoubleInitializedQueue(t *testing.T) {
+	t.Log("Running TestDoubleInitializedQueue")
 	ctx, cancel := context.WithCancel(context.Background())
 	factory := &pool.DefaultEventPoolWorkerFactory{}
 	defer cancel()

@@ -11,6 +11,7 @@ import (
 )
 
 func TestStartsAndRoutesEventsThroughPool(t *testing.T) {
+	t.Log("Running TestStartsAndRoutesEventsThroughPool")
 	ctx, cancel := context.WithCancel(context.Background())
 	factory := &mocks.TestWorkerFactory{}
 	defer cancel()
