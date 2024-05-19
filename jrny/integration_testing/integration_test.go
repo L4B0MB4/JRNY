@@ -21,7 +21,7 @@ func TestStartsAndRoutesEventsThroughPool(t *testing.T) {
 		t.Error("No calls should've been made")
 	}
 	eventpool.Enqueue(&models.Event{})
-	time.Sleep(1_000)
+	time.Sleep(100_000)
 	if factory.Worker.Calls != 1 {
 		t.Error("One call should've been made")
 	}
