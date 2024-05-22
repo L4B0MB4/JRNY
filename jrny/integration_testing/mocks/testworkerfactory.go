@@ -1,13 +1,15 @@
 package mocks
 
-import "github.com/L4B0MB4/JRNY/jrny/pool"
+import (
+	"github.com/L4B0MB4/JRNY/jrny/pool/worker"
+)
 
 type TestWorkerFactory struct {
 	Worker TestWorker
 }
 
-func (factory *TestWorkerFactory) Generate() []pool.EventPoolWorker {
+func (factory *TestWorkerFactory) Generate() []worker.EventPoolWorker {
 	factory.Worker = TestWorker{}
-	workerSlice := []pool.EventPoolWorker{&factory.Worker}
+	workerSlice := []worker.EventPoolWorker{&factory.Worker}
 	return workerSlice
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/L4B0MB4/JRNY/jrny/models"
+	w "github.com/L4B0MB4/JRNY/jrny/pool/worker"
 	"github.com/rs/zerolog/log"
 )
 
@@ -15,7 +16,7 @@ type EventPooler interface {
 
 type EventPool struct {
 	queue  chan models.Event
-	worker []EventPoolWorker
+	worker []w.EventPoolWorker
 }
 
 func (e *EventPool) queueInitializedGuard() error {
@@ -72,5 +73,4 @@ func (e *EventPool) PublishEvents() {
 			break
 		}
 	}
-
 }
