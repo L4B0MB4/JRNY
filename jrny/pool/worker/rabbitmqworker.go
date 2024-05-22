@@ -45,9 +45,12 @@ func (w *RabbitMqEventPoolWorker) SetUp() {
 }
 
 func (w *RabbitMqEventPoolWorker) Shutdown() {
-	w.active = false
-	w.channel.Close()
-	w.connection.Close()
+	if w.active {
+
+		w.active = false
+		w.channel.Close()
+		w.connection.Close()
+	}
 }
 
 func (w *RabbitMqEventPoolWorker) IsActive() bool {
