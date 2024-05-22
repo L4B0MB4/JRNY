@@ -11,3 +11,14 @@ type LoggingEventPoolWorker struct {
 func (worker *LoggingEventPoolWorker) OnEvent(event *models.Event) {
 	log.Debug().Interface("event", event).Msg("")
 }
+
+func (worker *LoggingEventPoolWorker) IsActive() bool {
+	return true
+
+}
+
+func (worker *LoggingEventPoolWorker) SetUp() {
+}
+
+func (worker *LoggingEventPoolWorker) Shutdown() {
+}

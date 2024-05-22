@@ -3,6 +3,7 @@ package pool
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/L4B0MB4/JRNY/jrny/models"
 	w "github.com/L4B0MB4/JRNY/jrny/pool/worker"
@@ -42,6 +43,7 @@ func (e *EventPool) onCancel(ctx context.Context) {
 		return
 	}
 	<-ctx.Done()
+	log.Debug().Msg(time.Now().String())
 	ctxerr := ctx.Err()
 	if ctxerr == context.Canceled {
 		log.Debug().Msg("Context was canceled")
@@ -49,6 +51,10 @@ func (e *EventPool) onCancel(ctx context.Context) {
 		log.Error().Msg("Unexpected context cancelation error")
 	}
 	close(e.queue)
+	for _, w := range e.worker {
+		w.Shutdown()
+	}
+	log.Debug().Msg(time.Now().String())
 }
 
 // Takes validated event models and enqueues them into the pool

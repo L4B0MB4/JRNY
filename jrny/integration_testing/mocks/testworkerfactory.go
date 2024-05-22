@@ -10,6 +10,7 @@ type TestWorkerFactory struct {
 
 func (factory *TestWorkerFactory) Generate() []worker.EventPoolWorker {
 	factory.Worker = TestWorker{}
+	factory.Worker.SetUp()
 	workerSlice := []worker.EventPoolWorker{&factory.Worker}
 	return workerSlice
 }

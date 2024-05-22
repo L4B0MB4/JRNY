@@ -12,6 +12,8 @@ type DefaultEventPoolWorkerFactory struct {
 }
 
 func (factory *DefaultEventPoolWorkerFactory) Generate() []w.EventPoolWorker {
-	workerSlice := []w.EventPoolWorker{&w.LoggingEventPoolWorker{}}
+	worker := w.RabbitMqEventPoolWorker{}
+	worker.SetUp()
+	workerSlice := []w.EventPoolWorker{&worker}
 	return workerSlice
 }

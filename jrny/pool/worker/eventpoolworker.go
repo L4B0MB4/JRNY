@@ -5,5 +5,8 @@ import (
 )
 
 type EventPoolWorker interface {
+	SetUp()
+	Shutdown()
+	IsActive() bool
 	OnEvent(event *models.Event)
 }
