@@ -1,3 +1,6 @@
+// Package contains pool that activates workers and sends them messages
+// on receive over a channel.
+
 package pool
 
 import (
@@ -57,7 +60,9 @@ func (e *EventPool) onCancel(ctx context.Context) {
 	log.Debug().Msg(time.Now().String())
 }
 
-// Takes validated event models and enqueues them into the pool
+/*
+Takes validated event models and enqueues them into the pool
+*/
 func (e *EventPool) Enqueue(event *models.Event) error {
 	err := e.queueInitializedGuard()
 	if err != nil {
