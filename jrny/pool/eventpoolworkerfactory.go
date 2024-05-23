@@ -9,13 +9,17 @@ type EventPoolWorkerFactory interface {
 }
 
 type DefaultEventPoolWorkerFactory struct {
-	useLoggingWorker bool
+	useQueueWorker bool
+	queueEndpoint  string
 }
 
 func (factory *DefaultEventPoolWorkerFactory) Generate() []w.EventPoolWorker {
 	var worker w.EventPoolWorker
-	if !factory.useLoggingWorker {
-		worker = &w.RabbitMqEventPoolWorker{}
+	if factory.useQueueWorker {
+		queueWorker := w.RabbitMqEventPoolWorker{}
+		queueWorker.Endpoint = factory.queueEndpoint
+		worker = &queueWorker
+
 	} else {
 		worker = &w.LoggingEventPoolWorker{}
 	}
@@ -24,6 +28,7 @@ func (factory *DefaultEventPoolWorkerFactory) Generate() []w.EventPoolWorker {
 	return workerSlice
 }
 
-func (factory *DefaultEventPoolWorkerFactory) UseLoggingWorker() {
-	factory.useLoggingWorker = true
+func (factory *DefaultEventPoolWorkerFactory) UseQueueWorker(queueEndpoint string) {
+	factory.useQueueWorker = true
+	factory.queueEndpoint = queueEndpoint
 }
