@@ -41,7 +41,7 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	ctx, cancel := context.WithCancel(context.Background())
 	factory := &pool.DefaultEventPoolWorkerFactory{}
-	factory.UseQueueWorker()
+	factory.UseQueueWorker("")
 	eventPool.Initialize(factory, ctx)
 	router := gin.Default()
 	router.POST("/api/event", onRequest)
