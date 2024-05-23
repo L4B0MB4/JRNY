@@ -24,7 +24,6 @@ func TestInitializedQueue(t *testing.T) {
 	defer cancel()
 	ep := pool.EventPool{}
 	factory := &pool.DefaultEventPoolWorkerFactory{}
-	factory.UseLoggingWorker()
 	ep.Initialize(factory, ctx)
 	err := ep.Enqueue(&models.Event{})
 
@@ -37,7 +36,6 @@ func TestDoubleInitializedQueue(t *testing.T) {
 	t.Log("Running TestDoubleInitializedQueue")
 	ctx, cancel := context.WithCancel(context.Background())
 	factory := &pool.DefaultEventPoolWorkerFactory{}
-	factory.UseLoggingWorker()
 	defer cancel()
 	ep := pool.EventPool{}
 	err := ep.Initialize(factory, ctx)
