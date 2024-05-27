@@ -6,8 +6,8 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/L4B0MB4/JRNY/jrny/models"
-	"github.com/L4B0MB4/JRNY/jrny/pool"
+	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
+	"github.com/L4B0MB4/JRNY/jrny/pkg/pool"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
