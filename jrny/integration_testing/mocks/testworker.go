@@ -1,6 +1,6 @@
 package mocks
 
-import "github.com/L4B0MB4/JRNY/jrny/models"
+import "github.com/L4B0MB4/JRNY/jrny/pkg/models"
 
 type TestWorker struct {
 	OnEventCalls  int

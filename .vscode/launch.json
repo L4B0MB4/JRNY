@@ -5,11 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch file",
+            "name": "Launch server file",
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "program": "jrny/main.go",
+            "program": "jrny/cmd/server/main.go",
+            "output": "debug"
+        },
+        {
+            "name": "Launch consumer file",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "jrny/cmd/consumer/main.go",
             "output": "debug"
         }
     ]

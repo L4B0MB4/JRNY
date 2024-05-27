@@ -8,8 +8,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/L4B0MB4/JRNY/jrny/models"
-	w "github.com/L4B0MB4/JRNY/jrny/pool/worker"
+	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
+	w "github.com/L4B0MB4/JRNY/jrny/pkg/pool/worker"
 	"github.com/rs/zerolog/log"
 )
 

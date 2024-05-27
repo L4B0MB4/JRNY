@@ -1,7 +1,7 @@
 package worker
 
 import (
-	"github.com/L4B0MB4/JRNY/jrny/models"
+	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
 )
 
 type EventPoolWorker interface {
