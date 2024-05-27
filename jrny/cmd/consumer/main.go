@@ -13,7 +13,11 @@ func main() {
 	log.Debug().Msg("Launching consumer")
 	defer log.Debug().Msg("Stopped consumer")
 	var c consumer.Consumer = &consumer.RabbitMqConsumer{}
-
-	c.Initialize()
+	err := c.Initialize()
+	if err != nil {
+		log.Error().Err(err).Msg("Stopping consumer, error during initialization")
+		return
+	}
+	c.Consume()
 
 }
