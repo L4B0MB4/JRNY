@@ -6,8 +6,10 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/L4B0MB4/JRNY/jrny/pkg/configuration"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/pool"
+	"github.com/L4B0MB4/JRNY/jrny/pkg/pool/factory"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -36,12 +38,25 @@ func onRequest(c *gin.Context) {
 var eventPool = pool.EventPool{}
 
 func main() {
+	config, workerFactory := setup()
+	start(config, workerFactory)
+}
+func setup() (*configuration.ServerConfiguration, factory.EventPoolWorkerFactory) {
+
+	config := configuration.DefaultConfiguration()
+	workerFactory := factory.RabbitMqEventPoolWorkerFactory{
+		Config: &config,
+	}
+
+	return &config, &workerFactory
+
+}
+func start(config *configuration.ServerConfiguration, factory factory.EventPoolWorkerFactory) {
+
 	signalCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	ctx, cancel := context.WithCancel(context.Background())
-	factory := &pool.DefaultEventPoolWorkerFactory{}
-	factory.UseQueueWorker("")
 	eventPool.Initialize(factory, ctx)
 	router := gin.Default()
 	router.POST("/api/event", onRequest)
@@ -61,5 +76,4 @@ func main() {
 	log.Debug().Msg("Shutting down ...")
 	cancel()
 	srv.Shutdown(ctx)
-
 }

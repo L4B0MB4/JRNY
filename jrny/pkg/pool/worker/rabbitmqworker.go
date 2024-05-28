@@ -20,10 +20,7 @@ type RabbitMqEventPoolWorker struct {
 }
 
 func (w *RabbitMqEventPoolWorker) SetUp() {
-	if w.Endpoint == "" {
-		w.Endpoint = "localhost:5672"
-	}
-	conn, err := amqp.Dial("amqp://guest:guest@" + w.Endpoint + "/")
+	conn, err := amqp.Dial(w.Endpoint)
 	if err != nil {
 		log.Error().Err(err).Msg("Could not connect to rabbitmq host")
 		return

@@ -8,8 +8,10 @@ import (
 	"time"
 
 	rabbitmq "github.com/L4B0MB4/JRNY/jrny/integration_testing/rabbitmq"
+	"github.com/L4B0MB4/JRNY/jrny/pkg/configuration"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/pool"
+	"github.com/L4B0MB4/JRNY/jrny/pkg/pool/factory"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog/log"
 )
@@ -41,8 +43,10 @@ func TestIntegratesWithRabbitMq(t *testing.T) {
 		return
 	}
 
-	factory := &pool.DefaultEventPoolWorkerFactory{}
-	factory.UseQueueWorker(endpoint)
+	config := configuration.DefaultConfiguration()
+	factory := &factory.RabbitMqEventPoolWorkerFactory{
+		Config: &config,
+	}
 	eventpool := pool.EventPool{}
 	err = eventpool.Initialize(factory, ctx)
 	if err != nil {

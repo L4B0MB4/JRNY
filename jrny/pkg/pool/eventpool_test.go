@@ -6,6 +6,7 @@ import (
 
 	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/pool"
+	"github.com/L4B0MB4/JRNY/jrny/pkg/pool/factory"
 )
 
 func TestUnInitializedQueue(t *testing.T) {
@@ -23,7 +24,7 @@ func TestInitializedQueue(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	ep := pool.EventPool{}
-	factory := &pool.DefaultEventPoolWorkerFactory{}
+	factory := &factory.RabbitMqEventPoolWorkerFactory{}
 	ep.Initialize(factory, ctx)
 	err := ep.Enqueue(&models.Event{})
 
@@ -35,7 +36,7 @@ func TestInitializedQueue(t *testing.T) {
 func TestDoubleInitializedQueue(t *testing.T) {
 	t.Log("Running TestDoubleInitializedQueue")
 	ctx, cancel := context.WithCancel(context.Background())
-	factory := &pool.DefaultEventPoolWorkerFactory{}
+	factory := &factory.RabbitMqEventPoolWorkerFactory{}
 	defer cancel()
 	ep := pool.EventPool{}
 	err := ep.Initialize(factory, ctx)

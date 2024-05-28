@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
+	"github.com/L4B0MB4/JRNY/jrny/pkg/pool/factory"
 	w "github.com/L4B0MB4/JRNY/jrny/pkg/pool/worker"
 	"github.com/rs/zerolog/log"
 )
@@ -29,7 +30,7 @@ func (e *EventPool) queueInitializedGuard() error {
 	}
 	return nil
 }
-func (e *EventPool) Initialize(factory EventPoolWorkerFactory, ctx context.Context) error {
+func (e *EventPool) Initialize(factory factory.EventPoolWorkerFactory, ctx context.Context) error {
 	if e.queue != nil {
 		return errors.New("initialization has been called before")
 	}
