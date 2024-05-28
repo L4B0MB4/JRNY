@@ -11,7 +11,6 @@ import (
 	"github.com/L4B0MB4/JRNY/jrny/pkg/server/pool"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/server/pool/factory"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -38,10 +37,8 @@ func onRequest(c *gin.Context) {
 var eventPool = pool.EventPool{}
 
 func Start(config *configuration.ServerConfiguration, factory factory.EventPoolWorkerFactory) {
-
 	signalCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	ctx, cancel := context.WithCancel(context.Background())
 	eventPool.Initialize(factory, ctx)
 	router := gin.Default()

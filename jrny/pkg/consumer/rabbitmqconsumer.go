@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/gob"
+	"fmt"
 
+	"github.com/L4B0MB4/JRNY/jrny/pkg/configuration"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog/log"
@@ -14,11 +16,17 @@ type RabbitMqConsumer struct {
 	initialized     bool
 	channel         *amqp.Channel
 	lifeTimeContext context.Context
+	Config          *configuration.ConsumerConfiguration
 }
 
 func (c *RabbitMqConsumer) Initialize() error {
+	if c.Config == nil {
+		err := fmt.Errorf("no config set")
+		log.Error().Err(err).Msg("No config set for consumer")
+		return err
+	}
 
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial(c.Config.QueueConfig.Endpoint)
 	if err != nil {
 		log.Error().Err(err).Msg("Could not connect to rabbitmq host")
 		return err
