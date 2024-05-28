@@ -1,7 +1,7 @@
 package mocks
 
 import (
-	"github.com/L4B0MB4/JRNY/jrny/pkg/pool/worker"
+	"github.com/L4B0MB4/JRNY/jrny/pkg/server/pool/worker"
 )
 
 type TestWorkerFactory struct {

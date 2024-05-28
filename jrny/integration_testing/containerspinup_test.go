@@ -10,8 +10,8 @@ import (
 	rabbitmq "github.com/L4B0MB4/JRNY/jrny/integration_testing/rabbitmq"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/configuration"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/pool"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/pool/factory"
+	"github.com/L4B0MB4/JRNY/jrny/pkg/server/pool"
+	"github.com/L4B0MB4/JRNY/jrny/pkg/server/pool/factory"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog/log"
 )
@@ -44,6 +44,7 @@ func TestIntegratesWithRabbitMq(t *testing.T) {
 	}
 
 	config := configuration.DefaultConfiguration()
+	config.QueueConfig.Endpoint = "amqp://guest:guest@" + endpoint + "/"
 	factory := &factory.RabbitMqEventPoolWorkerFactory{
 		Config: &config,
 	}
