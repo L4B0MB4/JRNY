@@ -7,7 +7,7 @@ import (
 
 	"github.com/L4B0MB4/JRNY/jrny/integration_testing/mocks"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/pool"
+	"github.com/L4B0MB4/JRNY/jrny/pkg/server/pool"
 )
 
 func TestStartsAndRoutesEventsThroughPool(t *testing.T) {
