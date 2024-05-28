@@ -25,7 +25,7 @@ func TestInitializedQueue(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	ep := pool.EventPool{}
-	config := configuration.DefaultConfiguration()
+	config := configuration.DefaultServerConfiguration()
 	factory := &factory.RabbitMqEventPoolWorkerFactory{
 		Config: &config,
 	}
@@ -40,7 +40,7 @@ func TestInitializedQueue(t *testing.T) {
 func TestDoubleInitializedQueue(t *testing.T) {
 	t.Log("Running TestDoubleInitializedQueue")
 	ctx, cancel := context.WithCancel(context.Background())
-	config := configuration.DefaultConfiguration()
+	config := configuration.DefaultServerConfiguration()
 	factory := &factory.RabbitMqEventPoolWorkerFactory{
 		Config: &config,
 	}

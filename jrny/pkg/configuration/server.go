@@ -5,7 +5,7 @@ type ServerConfiguration struct {
 	HttpConfig  *HttpServerConfig
 }
 
-func DefaultConfiguration() ServerConfiguration {
+func DefaultServerConfiguration() ServerConfiguration {
 	qC := RabbitMqConfiguration{}
 	qC.Default()
 	hC := HttpServerConfig{}

@@ -43,7 +43,7 @@ func TestIntegratesWithRabbitMq(t *testing.T) {
 		return
 	}
 
-	config := configuration.DefaultConfiguration()
+	config := configuration.DefaultServerConfiguration()
 	config.QueueConfig.Endpoint = "amqp://guest:guest@" + endpoint + "/"
 	factory := &factory.RabbitMqEventPoolWorkerFactory{
 		Config: &config,

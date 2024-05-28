@@ -12,7 +12,7 @@ func main() {
 }
 func setup() (*configuration.ServerConfiguration, factory.EventPoolWorkerFactory) {
 
-	config := configuration.DefaultConfiguration()
+	config := configuration.DefaultServerConfiguration()
 	workerFactory := factory.RabbitMqEventPoolWorkerFactory{
 		Config: &config,
 	}
