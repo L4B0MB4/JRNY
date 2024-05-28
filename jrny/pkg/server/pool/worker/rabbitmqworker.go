@@ -85,6 +85,10 @@ func (w *RabbitMqEventPoolWorker) OnEvent(event *models.Event) {
 		return
 	}
 	w.messageBuffer.Reset()
+	w.encoder = gob.NewEncoder(w.messageBuffer)
+	//todo: encoders apparently work by sending type once and then only values. that's too dangerous in this case
+	//as we do not know who has already read the type and who hasn't. Therefore this is a fix to be removed later
+	// when performance matters
 	err := w.encoder.Encode(event)
 	if err != nil {
 		log.Error().Err(err).Msg("Could not encode event into binary data")
