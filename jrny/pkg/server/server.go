@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 
 	"github.com/L4B0MB4/JRNY/jrny/pkg/configuration"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
@@ -44,7 +45,7 @@ func Start(config *configuration.ServerConfiguration, factory factory.EventPoolW
 	router := gin.Default()
 	router.POST("/api/event", onRequest)
 	srv := &http.Server{
-		Addr:    ":8081",
+		Addr:    config.HttpConfig.Host + ":" + strconv.Itoa(config.HttpConfig.Port),
 		Handler: router,
 	}
 	go func() {
