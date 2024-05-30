@@ -63,11 +63,17 @@ func (c *RabbitMqConsumer) Consume() {
 		log.Error().Err(err).Msg("Error reading message from channel")
 		return
 	}
-	msg := <-msgs
+	for msg := range msgs {
+		readMessage(msg)
+	}
+}
+
+func readMessage(msg amqp.Delivery) {
+
 	reader := bytes.NewReader(msg.Body)
 	decoder := gob.NewDecoder(reader)
 	readEvent := models.Event{}
-	err = decoder.Decode(&readEvent)
+	err := decoder.Decode(&readEvent)
 	if err != nil {
 		log.Error().Err(err).Bytes("msg", msg.Body).Msg("Error decoding read message")
 		return
