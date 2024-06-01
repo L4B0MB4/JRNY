@@ -13,11 +13,12 @@ type SelfConfiguringMerging struct {
 
 func (s *SelfConfiguringMerging) SelfConfigure() {
 	//todo self configure
+
 }
 
 func (s *SelfConfiguringMerging) Initialize(r *space.ResponsibleArea) {
 	s.responsibleArea = r
-	s.knownIdentifiers = make(map[[16]byte]*models.IdentifierReference, r.To-r.From)
+	s.knownIdentifiers = make(map[[16]byte]*models.IdentifierReference, ((r.To-r.From)/10000)+1)
 }
 
 func (s *SelfConfiguringMerging) Merge(event *models.Event) {
@@ -27,6 +28,7 @@ func (s *SelfConfiguringMerging) Merge(event *models.Event) {
 		v = &models.IdentifierReference{
 			Self: id,
 		}
+		s.knownIdentifiers[id] = v
 	}
 
 	log.Debug().Any("v", v).Msg("Logging v")
