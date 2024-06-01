@@ -28,7 +28,7 @@ func equalDivideSpace(workerAmount int64) (first *b.Int, space *b.Int) {
 	spaceSize := b.NewInt(0)
 	spaceSize.Div(spaceSizeDividable, workerAmountBig)
 
-	fmt.Printf("Equal space per worked is %x in hex\n", spaceSize)
+	fmt.Printf("Equal space per worker is %x in hex\n", spaceSize)
 	firstSpace := b.NewInt(0)
 	firstSpace.Add(spaceSize, leftOver)
 
