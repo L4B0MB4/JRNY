@@ -7,12 +7,12 @@ import (
 	"testing"
 	"time"
 
-	rabbitmq "github.com/L4B0MB4/JRNY/jrny/integration_testing/rabbitmq"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/configuration"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/helper"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/server/pool"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/server/pool/factory"
+	rabbitmq "github.com/L4B0MB4/JRNY/integration_testing/rabbitmq"
+	"github.com/L4B0MB4/JRNY/pkg/configuration"
+	"github.com/L4B0MB4/JRNY/pkg/helper"
+	"github.com/L4B0MB4/JRNY/pkg/models"
+	"github.com/L4B0MB4/JRNY/pkg/server/pool"
+	"github.com/L4B0MB4/JRNY/pkg/server/pool/factory"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog/log"
 )

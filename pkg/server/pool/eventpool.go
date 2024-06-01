@@ -8,9 +8,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/server/pool/factory"
-	w "github.com/L4B0MB4/JRNY/jrny/pkg/server/pool/worker"
+	"github.com/L4B0MB4/JRNY/pkg/models"
+	"github.com/L4B0MB4/JRNY/pkg/server/pool/factory"
+	w "github.com/L4B0MB4/JRNY/pkg/server/pool/worker"
 	"github.com/rs/zerolog/log"
 )
 

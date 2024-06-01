@@ -7,10 +7,10 @@ import (
 	"os/signal"
 	"strconv"
 
-	"github.com/L4B0MB4/JRNY/jrny/pkg/configuration"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/server/pool"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/server/pool/factory"
+	"github.com/L4B0MB4/JRNY/pkg/configuration"
+	"github.com/L4B0MB4/JRNY/pkg/models"
+	"github.com/L4B0MB4/JRNY/pkg/server/pool"
+	"github.com/L4B0MB4/JRNY/pkg/server/pool/factory"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 )
