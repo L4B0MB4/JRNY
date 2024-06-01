@@ -18,6 +18,7 @@ func main() {
 		log.Error().Err(err).Msg("Stopping consumer, error during initialization")
 		return
 	}
+
 	c.Consume()
 
 }
@@ -28,6 +29,9 @@ func setup() consumer.Consumer {
 	consumer := consumer.RabbitMqConsumer{
 		Config: &config,
 	}
+
+	responsibleAreaHandler := ResponsibleAreaHandler{}
+
 	return &consumer
 
 }
