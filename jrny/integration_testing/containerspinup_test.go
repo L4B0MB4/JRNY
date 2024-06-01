@@ -9,6 +9,7 @@ import (
 
 	rabbitmq "github.com/L4B0MB4/JRNY/jrny/integration_testing/rabbitmq"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/configuration"
+	"github.com/L4B0MB4/JRNY/jrny/pkg/helper"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/server/pool"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/server/pool/factory"
@@ -100,13 +101,8 @@ func createRabbitMqReader(endpoint string) (*amqp.Channel, error) {
 		log.Error().Err(err).Msg("Could not connect open rabbitmq channel")
 		return nil, err
 	}
-	_, err = ch.QueueDeclare("events", true, false, false, false, amqp.Table{amqp.QueueTypeArg: amqp.QueueTypeStream,
-		amqp.StreamMaxLenBytesArg:         int64(5_000_000_000), // 5 Gb
-		amqp.StreamMaxSegmentSizeBytesArg: 500_000_000,          // 500 Mb
-		amqp.StreamMaxAgeArg:              "3D",                 // 3 days
-	})
+	err = helper.CreateDefaultQueue(ch)
 	if err != nil {
-		log.Error().Err(err).Msg("Could not declare rabbitmq queue")
 		return nil, err
 	}
 	return ch, nil

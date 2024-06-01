@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"encoding/gob"
 
+	"github.com/L4B0MB4/JRNY/jrny/pkg/helper"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog/log"
 )
 
 type RabbitMqEventPoolWorker struct {
-	queue         *amqp.Queue
 	channel       *amqp.Channel
 	active        bool
 	messageBuffer *bytes.Buffer
@@ -30,18 +30,12 @@ func (w *RabbitMqEventPoolWorker) SetUp() {
 		log.Error().Err(err).Msg("Could not connect open rabbitmq channel")
 		return
 	}
-	queue, err := ch.QueueDeclare("events", true, false, false, false, amqp.Table{amqp.QueueTypeArg: amqp.QueueTypeStream,
-		amqp.StreamMaxLenBytesArg:         int64(5_000_000_000), // 5 Gb
-		amqp.StreamMaxSegmentSizeBytesArg: 500_000_000,          // 500 Mb
-		amqp.StreamMaxAgeArg:              "3D",                 // 3 days
-	})
+	err = helper.CreateDefaultQueue(ch)
 	if err != nil {
-		log.Error().Err(err).Msg("Could not declare rabbitmq queue")
 		return
 	}
 
 	w.connection = conn
-	w.queue = &queue
 	w.channel = ch
 	w.messageBuffer = &bytes.Buffer{}
 	w.encoder = gob.NewEncoder(w.messageBuffer)
@@ -70,7 +64,7 @@ func (w *RabbitMqEventPoolWorker) isInitialized() bool {
 		log.Error().Msg("Trying to use inactive RabbitMq Worker")
 		return false
 	}
-	if w.channel == nil || w.queue == nil {
+	if w.channel == nil {
 		w.active = false
 		log.Error().Msg("Incorrectly initialized RabbitMq Worker")
 		return false
@@ -98,7 +92,7 @@ func (w *RabbitMqEventPoolWorker) OnEvent(event *models.Event) {
 		log.Error().Err(err).Msg("Could not encode event into binary data")
 		return
 	}
-	err = w.channel.Publish("", w.queue.Name, false, false, amqp.Publishing{
+	err = w.channel.Publish("", "events", false, false, amqp.Publishing{
 		ContentType: "application/octet-stream",
 		Body:        w.messageBuffer.Bytes(),
 	})
