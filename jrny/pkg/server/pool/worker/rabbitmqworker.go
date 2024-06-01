@@ -30,7 +30,11 @@ func (w *RabbitMqEventPoolWorker) SetUp() {
 		log.Error().Err(err).Msg("Could not connect open rabbitmq channel")
 		return
 	}
-	queue, err := ch.QueueDeclare("events", false, false, false, false, nil)
+	queue, err := ch.QueueDeclare("events", true, false, false, false, amqp.Table{amqp.QueueTypeArg: amqp.QueueTypeStream,
+		amqp.StreamMaxLenBytesArg:         int64(5_000_000_000), // 5 Gb
+		amqp.StreamMaxSegmentSizeBytesArg: 500_000_000,          // 500 Mb
+		amqp.StreamMaxAgeArg:              "3D",                 // 3 days
+	})
 	if err != nil {
 		log.Error().Err(err).Msg("Could not declare rabbitmq queue")
 		return

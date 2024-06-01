@@ -26,10 +26,6 @@ func TestIntegratesWithRabbitMq(t *testing.T) {
 		return
 	}
 	defer container.Terminate(ctx)
-	if err != nil {
-		t.Error(err)
-		return
-	}
 
 	endpoint, err := container.PortEndpoint(context.Background(), "5672/tcp", "")
 	if err != nil {
@@ -59,15 +55,24 @@ func TestIntegratesWithRabbitMq(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	timeCtx, cancelTimeCtx := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	err = eventpool.Enqueue(&models.Event{Type: "mytype2"})
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	timeCtx, cancelTimeCtx := context.WithTimeout(context.Background(), 100*time.Millisecond*1000)
 	defer cancelTimeCtx()
-	msgs, err := channel.ConsumeWithContext(timeCtx, "events", "", true, false, false, false, nil)
+	err = channel.Qos(2, 0, false)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	msgs, err := channel.ConsumeWithContext(timeCtx, "events", "", false, false, false, false, amqp.Table{"x-stream-offset": "first"})
 	if err != nil {
 		t.Error(err)
 		return
 	}
 	msg := <-msgs
-
 	reader := bytes.NewReader(msg.Body)
 	var decoder = gob.NewDecoder(reader)
 	readEvent := models.Event{}
@@ -95,7 +100,11 @@ func createRabbitMqReader(endpoint string) (*amqp.Channel, error) {
 		log.Error().Err(err).Msg("Could not connect open rabbitmq channel")
 		return nil, err
 	}
-	_, err = ch.QueueDeclare("events", false, false, false, false, nil)
+	_, err = ch.QueueDeclare("events", true, false, false, false, amqp.Table{amqp.QueueTypeArg: amqp.QueueTypeStream,
+		amqp.StreamMaxLenBytesArg:         int64(5_000_000_000), // 5 Gb
+		amqp.StreamMaxSegmentSizeBytesArg: 500_000_000,          // 500 Mb
+		amqp.StreamMaxAgeArg:              "3D",                 // 3 days
+	})
 	if err != nil {
 		log.Error().Err(err).Msg("Could not declare rabbitmq queue")
 		return nil, err

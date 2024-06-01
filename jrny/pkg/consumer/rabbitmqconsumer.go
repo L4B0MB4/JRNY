@@ -36,7 +36,11 @@ func (c *RabbitMqConsumer) Initialize() error {
 		log.Error().Err(err).Msg("Could not connect open rabbitmq channel")
 		return err
 	}
-	_, err = c.channel.QueueDeclare("events", false, false, false, false, nil)
+	_, err = c.channel.QueueDeclare("events", true, false, false, false, amqp.Table{amqp.QueueTypeArg: amqp.QueueTypeStream,
+		amqp.StreamMaxLenBytesArg:         int64(5_000_000_000), // 5 Gb
+		amqp.StreamMaxSegmentSizeBytesArg: 500_000_000,          // 500 Mb
+		amqp.StreamMaxAgeArg:              "3D",                 // 3 days
+	})
 	if err != nil {
 		log.Error().Err(err).Msg("Could not declare rabbitmq queue")
 		return err
@@ -58,7 +62,8 @@ func (c *RabbitMqConsumer) Consume() {
 		return
 	}
 
-	msgs, err := c.channel.ConsumeWithContext(c.lifeTimeContext, "events", "", true, false, false, false, nil)
+	c.channel.Qos(2, 0, false)
+	msgs, err := c.channel.ConsumeWithContext(c.lifeTimeContext, "events", "", false, false, false, false, amqp.Table{"x-stream-offset": "first"})
 	if err != nil {
 		log.Error().Err(err).Msg("Error reading message from channel")
 		return
