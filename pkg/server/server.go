@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"time"
 
 	"github.com/L4B0MB4/JRNY/pkg/configuration"
 	"github.com/L4B0MB4/JRNY/pkg/models"
@@ -31,6 +32,7 @@ func onRequest(c *gin.Context) {
 		return
 
 	}
+	model.ReceivedAt = time.Now().UTC()
 	eventPool.Enqueue(&model)
 	c.Status(201)
 }

@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
+	"time"
 
 	"github.com/L4B0MB4/JRNY/pkg/configuration"
 	"github.com/L4B0MB4/JRNY/pkg/helper"
@@ -85,4 +86,5 @@ func (c *RabbitMqConsumer) readMessage(msg amqp.Delivery) {
 	log.Debug().Interface("readEvent", readEvent).Msg("Message from queue")
 
 	c.Merger.Merge(&readEvent)
+	log.Debug().Str("millisecondsToProcess", time.Now().UTC().Sub(readEvent.ReceivedAt).String()).Msg("Finished working on event")
 }
