@@ -43,6 +43,35 @@ func TestResponsibleAreaGuard(t *testing.T) {
 	if ok {
 		t.Error("Expected item not to be in knownIdentifiers due to it being out of range")
 	}
+	myuuid = uuid.MustParse("00000000-0000-0000-0000-000000000004")
+	m.Merge(&models.Event{
+		Type: "b-type",
+		ID:   myuuid,
+	})
+	_, ok = m.knownIdentifiers[myuuid]
+	if ok {
+		t.Error("Expected item not to be in knownIdentifiers due to it being out of range")
+	}
+}
+func TestResponsibleAreaGuardFitsArea(t *testing.T) {
+	m := SelfConfiguringMerging{}
+	m.Initialize(&space.ResponsibleArea{
+		From: *big.NewInt(1),
+		To:   *big.NewInt(4),
+	})
+	myuuid := uuid.MustParse("00000000-0000-0000-0000-000000000003")
+	_, ok := m.knownIdentifiers[myuuid]
+	if ok {
+		t.Error("Expected item not to be in knownIdentifiers")
+	}
+	m.Merge(&models.Event{
+		Type: "a-type",
+		ID:   myuuid,
+	})
+	_, ok = m.knownIdentifiers[myuuid]
+	if !ok {
+		t.Error("Expected item to be in knownIdentifiers due to it being in range")
+	}
 }
 
 func TestMergingUnkowns(t *testing.T) {
@@ -65,5 +94,4 @@ func TestMergingUnkowns(t *testing.T) {
 	if !ok {
 		t.Error("Expected item to be in knownIdentifiers")
 	}
-
 }
