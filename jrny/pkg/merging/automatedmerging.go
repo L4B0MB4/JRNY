@@ -45,7 +45,7 @@ func (s *SelfConfiguringMerging) Merge(event *models.Event) {
 
 	for _, relArr := range event.Relationships {
 		for _, relationship := range relArr {
-			v = s.getOrAddToKnownIdentifiers(*relationship.ID)
+			v = s.getOrAddToKnownIdentifiers(relationship.ID)
 			connections = append(connections, v)
 		}
 	}
