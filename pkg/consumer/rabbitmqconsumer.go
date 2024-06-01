@@ -6,10 +6,10 @@ import (
 	"encoding/gob"
 	"fmt"
 
-	"github.com/L4B0MB4/JRNY/jrny/pkg/configuration"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/helper"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/merging"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
+	"github.com/L4B0MB4/JRNY/pkg/configuration"
+	"github.com/L4B0MB4/JRNY/pkg/helper"
+	"github.com/L4B0MB4/JRNY/pkg/merging"
+	"github.com/L4B0MB4/JRNY/pkg/models"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog/log"
 )

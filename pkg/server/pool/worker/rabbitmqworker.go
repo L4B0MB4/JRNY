@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/gob"
 
-	"github.com/L4B0MB4/JRNY/jrny/pkg/helper"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
+	"github.com/L4B0MB4/JRNY/pkg/helper"
+	"github.com/L4B0MB4/JRNY/pkg/models"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog/log"
 )

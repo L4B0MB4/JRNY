@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/L4B0MB4/JRNY/jrny/pkg/configuration"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/server"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/server/pool/factory"
+	"github.com/L4B0MB4/JRNY/pkg/configuration"
+	"github.com/L4B0MB4/JRNY/pkg/server"
+	"github.com/L4B0MB4/JRNY/pkg/server/pool/factory"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )

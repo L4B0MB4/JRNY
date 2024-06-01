@@ -3,10 +3,10 @@ package main
 import (
 	"os"
 
-	"github.com/L4B0MB4/JRNY/jrny/pkg/configuration"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/consumer"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/merging"
-	"github.com/L4B0MB4/JRNY/jrny/pkg/space"
+	"github.com/L4B0MB4/JRNY/pkg/configuration"
+	"github.com/L4B0MB4/JRNY/pkg/consumer"
+	"github.com/L4B0MB4/JRNY/pkg/merging"
+	"github.com/L4B0MB4/JRNY/pkg/space"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
