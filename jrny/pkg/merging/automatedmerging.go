@@ -5,6 +5,7 @@ import (
 
 	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/space"
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )
 
@@ -37,14 +38,46 @@ func (s *SelfConfiguringMerging) Merge(event *models.Event) {
 		return
 	}
 
+	connections := make([]*models.IdentifierReference, 0)
+
+	v := s.getOrAddToKnownIdentifiers(id)
+	connections = append(connections, v)
+
+	for _, relArr := range event.Relationships {
+		for _, relationship := range relArr {
+			v = s.getOrAddToKnownIdentifiers(*relationship.ID)
+			connections = append(connections, v)
+		}
+	}
+
+	s.linkEverything(connections)
+
+	log.Debug().Any("event", event).Msg("Added event to knownidentifiers")
+
+}
+
+func (s *SelfConfiguringMerging) linkEverything(items []*models.IdentifierReference) {
+	for _, item := range items {
+		for _, otherItem := range items {
+			if otherItem == item {
+				continue
+			}
+			_, ok := item.Linked[otherItem.Self]
+			if !ok {
+				item.Linked[otherItem.Self] = otherItem
+			}
+		}
+	}
+}
+
+func (s *SelfConfiguringMerging) getOrAddToKnownIdentifiers(id uuid.UUID) *models.IdentifierReference {
 	v, ok := s.knownIdentifiers[id]
 	if !ok {
 		v = &models.IdentifierReference{
-			Self: id,
+			Self:   id,
+			Linked: make(map[[16]byte]*models.IdentifierReference),
 		}
 		s.knownIdentifiers[id] = v
 	}
-
-	log.Debug().Any("v", v).Msg("Logging v")
-
+	return v
 }
