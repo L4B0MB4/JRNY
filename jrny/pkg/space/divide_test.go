@@ -1,26 +1,30 @@
 package space
 
-import "testing"
+import (
+	"math/big"
+	"testing"
+)
 
 func TestEqualDivideSpace(t *testing.T) {
+	MaxSpaceSize = big.NewInt(0xFFFFFFFF + 1)
 	firstSpace, remainingSpace := equalDivideSpace(1)
-	if firstSpace != 0x100000000 || remainingSpace != firstSpace {
+	if firstSpace.Int64() != 0x100000000 || remainingSpace.Int64() != firstSpace.Int64() {
 		t.Error("Dividing up spaces does not create proper space sizes")
 	}
 	firstSpace, remainingSpace = equalDivideSpace(2)
-	if firstSpace != 0x80000000 || remainingSpace != firstSpace {
+	if firstSpace.Int64() != 0x80000000 || remainingSpace.Int64() != firstSpace.Int64() {
 		t.Error("Dividing up spaces does not create proper space sizes")
 	}
 	firstSpace, remainingSpace = equalDivideSpace(3)
-	if firstSpace != 0x55555556 || remainingSpace != (firstSpace-1) {
+	if firstSpace.Int64() != 0x55555556 || remainingSpace.Int64() != (firstSpace.Int64()-1) {
 		t.Error("Dividing up spaces does not create proper space sizes")
 	}
 	firstSpace, remainingSpace = equalDivideSpace(4)
-	if firstSpace != 0x40000000 || remainingSpace != firstSpace {
+	if firstSpace.Int64() != 0x40000000 || remainingSpace.Int64() != firstSpace.Int64() {
 		t.Error("Dividing up spaces does not create proper space sizes")
 	}
 	firstSpace, remainingSpace = equalDivideSpace(5)
-	if firstSpace != 0x33333334 || remainingSpace != (firstSpace-1) {
+	if firstSpace.Int64() != 0x33333334 || remainingSpace.Int64() != (firstSpace.Int64()-1) {
 		t.Error("Dividing up spaces does not create proper space sizes")
 	}
 }

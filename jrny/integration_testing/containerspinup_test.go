@@ -56,11 +56,6 @@ func TestIntegratesWithRabbitMq(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	err = eventpool.Enqueue(&models.Event{Type: "mytype2"})
-	if err != nil {
-		t.Error(err)
-		return
-	}
 	timeCtx, cancelTimeCtx := context.WithTimeout(context.Background(), 100*time.Millisecond*1000)
 	defer cancelTimeCtx()
 	err = channel.Qos(2, 0, false)
@@ -74,6 +69,7 @@ func TestIntegratesWithRabbitMq(t *testing.T) {
 		return
 	}
 	msg := <-msgs
+	msg.Ack(true)
 	reader := bytes.NewReader(msg.Body)
 	var decoder = gob.NewDecoder(reader)
 	readEvent := models.Event{}

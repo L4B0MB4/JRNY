@@ -8,6 +8,7 @@ import (
 
 	"github.com/L4B0MB4/JRNY/jrny/pkg/configuration"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/helper"
+	"github.com/L4B0MB4/JRNY/jrny/pkg/merging"
 	"github.com/L4B0MB4/JRNY/jrny/pkg/models"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog/log"
@@ -18,6 +19,7 @@ type RabbitMqConsumer struct {
 	channel         *amqp.Channel
 	lifeTimeContext context.Context
 	Config          *configuration.ConsumerConfiguration
+	Merger          merging.Merger
 }
 
 func (c *RabbitMqConsumer) Initialize() error {
@@ -65,11 +67,12 @@ func (c *RabbitMqConsumer) Consume() {
 		return
 	}
 	for msg := range msgs {
-		readMessage(msg)
+		c.readMessage(msg)
+		msg.Ack(true)
 	}
 }
 
-func readMessage(msg amqp.Delivery) {
+func (c *RabbitMqConsumer) readMessage(msg amqp.Delivery) {
 
 	reader := bytes.NewReader(msg.Body)
 	decoder := gob.NewDecoder(reader)
@@ -80,4 +83,6 @@ func readMessage(msg amqp.Delivery) {
 		return
 	}
 	log.Debug().Interface("readEvent", readEvent).Msg("Message from queue")
+
+	c.Merger.Merge(&readEvent)
 }

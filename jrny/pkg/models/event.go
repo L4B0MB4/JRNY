@@ -12,6 +12,6 @@ type Event struct {
 }
 
 type Relation struct {
-	Type string     `json:"type" binding:"required"`
-	ID   *uuid.UUID `json:"id" binding:"required"`
+	Type string    `json:"type" binding:"required"`
+	ID   uuid.UUID `json:"id" binding:"required"`
 }
