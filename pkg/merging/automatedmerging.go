@@ -9,6 +9,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type GetOrCreateResponse struct {
+	identifier   *models.IdentifierReference
+	newlyCreated bool
+}
+
 type SelfConfiguringMerging struct {
 	responsibleArea  *space.ResponsibleArea
 	knownIdentifiers map[[16]byte]*models.IdentifierReference
@@ -38,7 +43,7 @@ func (s *SelfConfiguringMerging) Merge(event *models.Event) {
 		return
 	}
 
-	connections := make([]*models.IdentifierReference, 0)
+	connections := make([]*GetOrCreateResponse, 0)
 
 	v := s.getOrAddToKnownIdentifiers(id)
 	connections = append(connections, v)
@@ -56,21 +61,26 @@ func (s *SelfConfiguringMerging) Merge(event *models.Event) {
 
 }
 
-func (s *SelfConfiguringMerging) linkEverything(items []*models.IdentifierReference) {
+func (s *SelfConfiguringMerging) linkEverything(items []*GetOrCreateResponse) (merges []*models.IdentifierReference) {
 	for _, item := range items {
 		for _, otherItem := range items {
 			if otherItem == item {
 				continue
 			}
-			_, ok := item.Linked[otherItem.Self]
+			_, ok := item.identifier.Linked[otherItem.identifier.Self]
 			if !ok {
-				item.Linked[otherItem.Self] = otherItem
+				item.identifier.Linked[otherItem.identifier.Self] = otherItem.identifier
+				if !item.newlyCreated {
+					merges = append(merges, item.identifier)
+				}
 			}
 		}
 	}
+	return merges
 }
 
-func (s *SelfConfiguringMerging) getOrAddToKnownIdentifiers(id uuid.UUID) *models.IdentifierReference {
+// Returns the IdentifierReference and a boolean indicating if it was newly created
+func (s *SelfConfiguringMerging) getOrAddToKnownIdentifiers(id uuid.UUID) *GetOrCreateResponse {
 	v, ok := s.knownIdentifiers[id]
 	if !ok {
 		v = &models.IdentifierReference{
@@ -78,6 +88,7 @@ func (s *SelfConfiguringMerging) getOrAddToKnownIdentifiers(id uuid.UUID) *model
 			Linked: make(map[[16]byte]*models.IdentifierReference),
 		}
 		s.knownIdentifiers[id] = v
+		return &GetOrCreateResponse{identifier: v, newlyCreated: true}
 	}
-	return v
+	return &GetOrCreateResponse{identifier: v, newlyCreated: false}
 }
