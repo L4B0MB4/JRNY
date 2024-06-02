@@ -39,19 +39,18 @@ func (s *SelfConfiguringMerging) ResponsibleAreaGuard(id [16]byte) bool {
 
 func (s *SelfConfiguringMerging) Merge(event *models.Event) {
 	id := event.ID
-	if !s.ResponsibleAreaGuard(id) {
-		return
-	}
-
 	connections := make([]*GetOrCreateResponse, 0)
-
-	v := s.getOrAddToKnownIdentifiers(id)
-	connections = append(connections, v)
+	if s.ResponsibleAreaGuard(id) {
+		v := s.getOrAddToKnownIdentifiers(id)
+		connections = append(connections, v)
+	}
 
 	for _, relArr := range event.Relationships {
 		for _, relationship := range relArr {
-			v = s.getOrAddToKnownIdentifiers(relationship.ID)
-			connections = append(connections, v)
+			if s.ResponsibleAreaGuard(relationship.ID) {
+				v := s.getOrAddToKnownIdentifiers(relationship.ID)
+				connections = append(connections, v)
+			}
 		}
 	}
 
