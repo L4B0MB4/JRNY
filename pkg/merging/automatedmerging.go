@@ -9,11 +9,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type GetOrCreateResponse struct {
-	identifier   *models.IdentifierReference
-	newlyCreated bool
-}
-
 type SelfConfiguringMerging struct {
 	responsibleArea  *space.ResponsibleArea
 	knownIdentifiers map[[16]byte]*models.IdentifierReference
@@ -29,7 +24,7 @@ func (s *SelfConfiguringMerging) Initialize(r *space.ResponsibleArea) {
 	s.knownIdentifiers = make(map[[16]byte]*models.IdentifierReference, 1000)
 }
 
-func (s *SelfConfiguringMerging) ResponsibleAreaGuard(id [16]byte) bool {
+func (s *SelfConfiguringMerging) responsibleAreaGuard(id [16]byte) bool {
 	idBigInt := big.NewInt(0).SetBytes(id[:])
 	if idBigInt.Cmp(&s.responsibleArea.From) >= 0 && idBigInt.Cmp(&s.responsibleArea.To) == -1 {
 		return true
@@ -37,58 +32,83 @@ func (s *SelfConfiguringMerging) ResponsibleAreaGuard(id [16]byte) bool {
 	return false
 }
 
-func (s *SelfConfiguringMerging) Merge(event *models.Event) {
+func (s *SelfConfiguringMerging) Merge(event *models.Event) Merges {
 	id := event.ID
-	if !s.ResponsibleAreaGuard(id) {
-		return
-	}
-
-	connections := make([]*GetOrCreateResponse, 0)
-
-	v := s.getOrAddToKnownIdentifiers(id)
-	connections = append(connections, v)
-
+	connections := make([][16]byte, 0)
+	connections = append(connections, id)
 	for _, relArr := range event.Relationships {
 		for _, relationship := range relArr {
-			v = s.getOrAddToKnownIdentifiers(relationship.ID)
-			connections = append(connections, v)
+			connections = append(connections, relationship.ID)
 		}
 	}
 
-	s.linkEverything(connections)
+	merges := s.linkEverything(connections)
 
 	log.Debug().Any("event", event).Msg("Added event to knownidentifiers")
+	return merges
 
 }
 
-func (s *SelfConfiguringMerging) linkEverything(items []*GetOrCreateResponse) (merges []*models.IdentifierReference) {
+func (s *SelfConfiguringMerging) linkEverything(items [][16]byte) (merges Merges) {
+
 	for _, item := range items {
-		for _, otherItem := range items {
-			if otherItem == item {
-				continue
-			}
-			_, ok := item.identifier.Linked[otherItem.identifier.Self]
-			if !ok {
-				item.identifier.Linked[otherItem.identifier.Self] = otherItem.identifier
-				if !item.newlyCreated {
-					merges = append(merges, item.identifier)
+		if s.responsibleAreaGuard(item) {
+			v := s.getOrAddToKnownIdentifiers(item)
+			for _, otherItem := range items {
+				if item != otherItem {
+					v.Linked = append(v.Linked, otherItem)
+					//todo: add merge information somewhere
+					merges = s.getOrAddMerges(item, otherItem, merges)
+
 				}
 			}
 		}
+
+	}
+	return merges
+}
+
+func (s *SelfConfiguringMerging) getOrAddMerges(to [16]byte, add [16]byte, merges Merges) Merges {
+	found := false
+	for i := 0; i < len(merges); i++ {
+
+		_, ok := merges[i][to]
+		if ok {
+			_, ok = merges[i][add]
+			if !ok {
+				merges[i][add] = true
+			}
+			found = true
+			break
+		}
+		_, ok = merges[i][add]
+		if ok {
+			_, ok = merges[i][to]
+			if !ok {
+				merges[i][to] = true
+			}
+			found = true
+			break
+		}
+	}
+	if !found {
+		merges = append(merges, make(map[[16]byte]bool))
+		merges[len(merges)-1][to] = true
+		merges[len(merges)-1][add] = true
 	}
 	return merges
 }
 
 // Returns the IdentifierReference and a boolean indicating if it was newly created
-func (s *SelfConfiguringMerging) getOrAddToKnownIdentifiers(id uuid.UUID) *GetOrCreateResponse {
+func (s *SelfConfiguringMerging) getOrAddToKnownIdentifiers(id uuid.UUID) *models.IdentifierReference {
 	v, ok := s.knownIdentifiers[id]
 	if !ok {
 		v = &models.IdentifierReference{
 			Self:   id,
-			Linked: make(map[[16]byte]*models.IdentifierReference),
+			Linked: make([][16]byte, 0),
 		}
 		s.knownIdentifiers[id] = v
-		return &GetOrCreateResponse{identifier: v, newlyCreated: true}
+		return v
 	}
-	return &GetOrCreateResponse{identifier: v, newlyCreated: false}
+	return v
 }
