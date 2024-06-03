@@ -9,13 +9,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type Merges []map[[16]byte]bool
-
-type GetOrCreateResponse struct {
-	identifier   *models.IdentifierReference
-	newlyCreated bool
-}
-
 type SelfConfiguringMerging struct {
 	responsibleArea  *space.ResponsibleArea
 	knownIdentifiers map[[16]byte]*models.IdentifierReference
