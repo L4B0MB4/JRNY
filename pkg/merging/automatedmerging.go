@@ -9,6 +9,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type Merges []map[[16]byte]bool
+
 type GetOrCreateResponse struct {
 	identifier   *models.IdentifierReference
 	newlyCreated bool
@@ -37,7 +39,7 @@ func (s *SelfConfiguringMerging) responsibleAreaGuard(id [16]byte) bool {
 	return false
 }
 
-func (s *SelfConfiguringMerging) Merge(event *models.Event) {
+func (s *SelfConfiguringMerging) Merge(event *models.Event) Merges {
 	id := event.ID
 	connections := make([][16]byte, 0)
 	connections = append(connections, id)
@@ -47,13 +49,15 @@ func (s *SelfConfiguringMerging) Merge(event *models.Event) {
 		}
 	}
 
-	s.linkEverything(connections)
+	merges := s.linkEverything(connections)
 
 	log.Debug().Any("event", event).Msg("Added event to knownidentifiers")
+	return merges
 
 }
 
-func (s *SelfConfiguringMerging) linkEverything(items [][16]byte) (merges []*models.IdentifierReference) {
+func (s *SelfConfiguringMerging) linkEverything(items [][16]byte) (merges Merges) {
+
 	for _, item := range items {
 		if s.responsibleAreaGuard(item) {
 			v := s.getOrAddToKnownIdentifiers(item)
@@ -61,10 +65,43 @@ func (s *SelfConfiguringMerging) linkEverything(items [][16]byte) (merges []*mod
 				if item != otherItem {
 					v.Linked = append(v.Linked, otherItem)
 					//todo: add merge information somewhere
+					merges = s.getOrAddMerges(item, otherItem, merges)
+
 				}
 			}
 		}
 
+	}
+	return merges
+}
+
+func (s *SelfConfiguringMerging) getOrAddMerges(to [16]byte, add [16]byte, merges Merges) Merges {
+	found := false
+	for i := 0; i < len(merges); i++ {
+
+		_, ok := merges[i][to]
+		if ok {
+			_, ok = merges[i][add]
+			if !ok {
+				merges[i][add] = true
+			}
+			found = true
+			break
+		}
+		_, ok = merges[i][add]
+		if ok {
+			_, ok = merges[i][to]
+			if !ok {
+				merges[i][to] = true
+			}
+			found = true
+			break
+		}
+	}
+	if !found {
+		merges = append(merges, make(map[[16]byte]bool))
+		merges[len(merges)-1][to] = true
+		merges[len(merges)-1][add] = true
 	}
 	return merges
 }
