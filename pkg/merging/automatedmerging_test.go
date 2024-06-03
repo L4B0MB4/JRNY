@@ -2,6 +2,7 @@ package merging
 
 import (
 	"math/big"
+	"slices"
 	"testing"
 
 	"github.com/L4B0MB4/JRNY/pkg/models"
@@ -96,6 +97,7 @@ func TestMergingUnkowns(t *testing.T) {
 	}
 }
 
+/*
 func TestMergingEndResult(t *testing.T) {
 
 	m := SelfConfiguringMerging{}
@@ -162,6 +164,59 @@ func TestMergingEndResult(t *testing.T) {
 	_, ok = v.Linked[myuuid3]
 	if !ok {
 		t.Error("Should contain thrid identifier")
+	}
+
+}
+*/
+
+func TestMerge(t *testing.T) {
+
+	m := SelfConfiguringMerging{}
+	m.Initialize(&space.ResponsibleArea{
+		From: *big.NewInt(0),
+		To:   *big.NewInt(4),
+	})
+
+	myuuid1 := uuid.MustParse("00000000-0000-0000-0000-000000000001")
+	myuuid2 := uuid.MustParse("00000000-0000-0000-0000-000000000002")
+	myuuid7 := uuid.MustParse("00000000-0000-0000-0000-000000000007")
+	if len(m.knownIdentifiers) != 0 {
+		t.Error("KnownIdentifiers should be empty")
+		return
+	}
+	m.Merge(&models.Event{
+		Type: "b-type",
+		ID:   myuuid1,
+		Relationships: map[string][]models.Relation{
+			"rel-type": {
+				{
+					Type: "some-type",
+					ID:   myuuid2,
+				},
+				{
+					Type: "some-type",
+					ID:   myuuid7,
+				},
+			},
+		},
+	})
+	if len(m.knownIdentifiers) != 2 {
+		t.Errorf("KnownIdentifiers should be contain 2 elements but contains %v", len(m.knownIdentifiers))
+		return
+	}
+
+	v := m.knownIdentifiers[myuuid1]
+
+	if v == nil || len(v.Linked) != 2 || !slices.Contains(v.Linked, [16]byte(myuuid2)) || !slices.Contains(v.Linked, [16]byte(myuuid7)) {
+		t.Error("Incorrectly connected identifier")
+		return
+	}
+
+	v = m.knownIdentifiers[myuuid2]
+
+	if v == nil || len(v.Linked) != 2 || !slices.Contains(v.Linked, [16]byte(myuuid1)) || !slices.Contains(v.Linked, [16]byte(myuuid7)) {
+		t.Error("Incorrectly connected identifier")
+		return
 	}
 
 }

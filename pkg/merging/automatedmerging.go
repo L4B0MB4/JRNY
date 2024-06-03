@@ -29,7 +29,7 @@ func (s *SelfConfiguringMerging) Initialize(r *space.ResponsibleArea) {
 	s.knownIdentifiers = make(map[[16]byte]*models.IdentifierReference, 1000)
 }
 
-func (s *SelfConfiguringMerging) ResponsibleAreaGuard(id [16]byte) bool {
+func (s *SelfConfiguringMerging) responsibleAreaGuard(id [16]byte) bool {
 	idBigInt := big.NewInt(0).SetBytes(id[:])
 	if idBigInt.Cmp(&s.responsibleArea.From) >= 0 && idBigInt.Cmp(&s.responsibleArea.To) == -1 {
 		return true
@@ -39,18 +39,11 @@ func (s *SelfConfiguringMerging) ResponsibleAreaGuard(id [16]byte) bool {
 
 func (s *SelfConfiguringMerging) Merge(event *models.Event) {
 	id := event.ID
-	connections := make([]*GetOrCreateResponse, 0)
-	if s.ResponsibleAreaGuard(id) {
-		v := s.getOrAddToKnownIdentifiers(id)
-		connections = append(connections, v)
-	}
-
+	connections := make([][16]byte, 0)
+	connections = append(connections, id)
 	for _, relArr := range event.Relationships {
 		for _, relationship := range relArr {
-			if s.ResponsibleAreaGuard(relationship.ID) {
-				v := s.getOrAddToKnownIdentifiers(relationship.ID)
-				connections = append(connections, v)
-			}
+			connections = append(connections, relationship.ID)
 		}
 	}
 
@@ -60,34 +53,32 @@ func (s *SelfConfiguringMerging) Merge(event *models.Event) {
 
 }
 
-func (s *SelfConfiguringMerging) linkEverything(items []*GetOrCreateResponse) (merges []*models.IdentifierReference) {
+func (s *SelfConfiguringMerging) linkEverything(items [][16]byte) (merges []*models.IdentifierReference) {
 	for _, item := range items {
-		for _, otherItem := range items {
-			if otherItem == item {
-				continue
-			}
-			_, ok := item.identifier.Linked[otherItem.identifier.Self]
-			if !ok {
-				item.identifier.Linked[otherItem.identifier.Self] = otherItem.identifier
-				if !item.newlyCreated {
-					merges = append(merges, item.identifier)
+		if s.responsibleAreaGuard(item) {
+			v := s.getOrAddToKnownIdentifiers(item)
+			for _, otherItem := range items {
+				if item != otherItem {
+					v.Linked = append(v.Linked, otherItem)
+					//todo: add merge information somewhere
 				}
 			}
 		}
+
 	}
 	return merges
 }
 
 // Returns the IdentifierReference and a boolean indicating if it was newly created
-func (s *SelfConfiguringMerging) getOrAddToKnownIdentifiers(id uuid.UUID) *GetOrCreateResponse {
+func (s *SelfConfiguringMerging) getOrAddToKnownIdentifiers(id uuid.UUID) *models.IdentifierReference {
 	v, ok := s.knownIdentifiers[id]
 	if !ok {
 		v = &models.IdentifierReference{
 			Self:   id,
-			Linked: make(map[[16]byte]*models.IdentifierReference),
+			Linked: make([][16]byte, 0),
 		}
 		s.knownIdentifiers[id] = v
-		return &GetOrCreateResponse{identifier: v, newlyCreated: true}
+		return v
 	}
-	return &GetOrCreateResponse{identifier: v, newlyCreated: false}
+	return v
 }
