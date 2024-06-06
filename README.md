@@ -90,6 +90,26 @@ Thinking about these small areas this looks like a lot of duplicated data but wi
 
 # Docker
 
+## Server
+
+From the main folder you can run
+
+```bash
+docker build -t jrny/server -f deployment/docker/server/Dockerfile .
+```
+
+to build the server docker file and then
+
+```bash
+docker run -it -p 8081:8081 --name jrny_server jrny/server
+```
+
+to run it
+
+## Consumer
+
+Similar to server but with adjusted path to consumer dockerfile
+
 ## RabbitMQ
 
 Locally currently using
