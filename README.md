@@ -90,9 +90,15 @@ Thinking about these small areas this looks like a lot of duplicated data but wi
 
 # Docker
 
+## ENV Variables
+
+```
+RABBITMQ_URL = e.g. amqp://guest:guest@localhost:5672/
+```
+
 ## Server
 
-From the main folder you can run
+From the root folder you can run
 
 ```bash
 docker build -t jrny/server -f deployment/docker/server/Dockerfile .
@@ -115,10 +121,22 @@ Similar to server but with adjusted path to consumer dockerfile
 Locally currently using
 
 ```bash
-docker run --hostname=my-rabbit -p 8080:15672 -p 5672:5672 -d rabbitmq:3-management
+docker run --name some-rabbit -p 8080:15672 -p 5672:5672 -d --net jrny_net rabbitmq:3-management
 ```
 
 for development
+
+## Example on running everything
+
+```bash
+docker network create jrny_net
+
+docker run --name some-rabbit -p 8080:15672 -p 5672:5672 -d --net jrny_net rabbitmq:3-management
+
+docker run -d -p 8081:8081 --name jrny_server --env RABBITMQ_URL=amqp://guest:guest@some-rabbit:5672/ --net jrny_net jrny/server
+
+docker run -d --name jrny_consumer --env RABBITMQ_URL=amqp://guest:guest@some-rabbit:5672/ --net jrny_net jrny/consumer
+```
 
 # Requests
 
