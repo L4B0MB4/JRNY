@@ -58,12 +58,14 @@ func (s *SelfConfiguringMerging) linkEverything(items [][16]byte) (merges Merges
 				if item != otherItem {
 					v.Linked = append(v.Linked, otherItem)
 					//todo: add merge information somewhere
-					merges = s.getOrAddMerges(item, otherItem, merges)
+
+					if s.responsibleAreaGuard(items[0]) { // first must be always event-id
+						merges = s.getOrAddMerges(item, otherItem, merges)
+					}
 
 				}
 			}
 		}
-
 	}
 	return merges
 }
@@ -71,7 +73,6 @@ func (s *SelfConfiguringMerging) linkEverything(items [][16]byte) (merges Merges
 func (s *SelfConfiguringMerging) getOrAddMerges(to [16]byte, add [16]byte, merges Merges) Merges {
 	found := false
 	for i := 0; i < len(merges); i++ {
-
 		_, ok := merges[i][to]
 		if ok {
 			_, ok = merges[i][add]

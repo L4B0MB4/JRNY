@@ -234,3 +234,175 @@ func TestMerge(t *testing.T) {
 	}
 
 }
+
+func TestOneSidedMerge(t *testing.T) {
+	mBig := SelfConfiguringMerging{}
+	mBig.Initialize(&space.ResponsibleArea{
+		From: *big.NewInt(4),
+		To:   *big.NewInt(8),
+	})
+	mSmall := SelfConfiguringMerging{}
+	mSmall.Initialize(&space.ResponsibleArea{
+		From: *big.NewInt(0),
+		To:   *big.NewInt(4),
+	})
+
+	myuuid1 := uuid.MustParse("00000000-0000-0000-0000-000000000001")
+	myuuid7 := uuid.MustParse("00000000-0000-0000-0000-000000000007")
+
+	f := &models.Event{
+		Type: "a",
+		ID:   myuuid1,
+		Relationships: map[string][]models.Relation{
+			"b": {
+				models.Relation{
+					Type: "c",
+					ID:   myuuid7,
+				},
+			},
+		},
+	}
+
+	merges := mSmall.Merge(f)
+
+	if len(merges) != 1 {
+		t.Errorf("Merges should contain 1 item but contain %v", len(merges))
+		return
+	}
+
+	merges = mBig.Merge(f)
+
+	if len(merges) != 0 {
+		t.Errorf("Merges should contain 0 items but contain %v", len(merges))
+		return
+	}
+}
+
+func TestOneSidedMergeWithAdditionalData(t *testing.T) {
+	mBig := SelfConfiguringMerging{}
+	mBig.Initialize(&space.ResponsibleArea{
+		From: *big.NewInt(4),
+		To:   *big.NewInt(8),
+	})
+	mSmall := SelfConfiguringMerging{}
+	mSmall.Initialize(&space.ResponsibleArea{
+		From: *big.NewInt(0),
+		To:   *big.NewInt(4),
+	})
+
+	myuuid1 := uuid.MustParse("00000000-0000-0000-0000-000000000001")
+	myuuid2 := uuid.MustParse("00000000-0000-0000-0000-000000000002")
+	myuuid7 := uuid.MustParse("00000000-0000-0000-0000-000000000007")
+
+	first := &models.Event{
+		Type: "a",
+		ID:   myuuid1,
+		Relationships: map[string][]models.Relation{
+			"b": {
+				models.Relation{
+					Type: "c",
+					ID:   myuuid7,
+				},
+			},
+		},
+	}
+	mSmall.Merge(first)
+	mBig.Merge(first)
+
+	second := &models.Event{
+		Type: "a",
+		ID:   myuuid7,
+		Relationships: map[string][]models.Relation{
+			"b": {
+				models.Relation{
+					Type: "c",
+					ID:   myuuid2,
+				},
+			},
+		},
+	}
+	merges := mSmall.Merge(second)
+	if len(merges) != 0 {
+		t.Errorf("Merges should contain 0 items but contain %v", len(merges))
+		return
+	}
+
+	merges = mBig.Merge(second)
+
+	if len(merges) != 1 {
+		t.Errorf("Merges should contain 1 item but contain %v", len(merges))
+		return
+	}
+
+	_, ok := merges[0][myuuid7]
+	if !ok {
+		t.Error("myuuid7 should be in the merge list")
+		return
+	}
+	_, ok = merges[0][myuuid2]
+	if !ok {
+		t.Error("myuuid2 should be in the merge list")
+		return
+	}
+}
+
+func TestOneSidedMergeForThreeSeparateAreas(t *testing.T) {
+	mBig := SelfConfiguringMerging{}
+	mBig.Initialize(&space.ResponsibleArea{
+		From: *big.NewInt(8),
+		To:   *big.NewInt(99),
+	})
+	mMid := SelfConfiguringMerging{}
+	mMid.Initialize(&space.ResponsibleArea{
+		From: *big.NewInt(4),
+		To:   *big.NewInt(8),
+	})
+	mSmall := SelfConfiguringMerging{}
+	mSmall.Initialize(&space.ResponsibleArea{
+		From: *big.NewInt(0),
+		To:   *big.NewInt(4),
+	})
+
+	myuuid1 := uuid.MustParse("00000000-0000-0000-0000-000000000001")
+	myuuid7 := uuid.MustParse("00000000-0000-0000-0000-000000000007")
+	myuuid15 := uuid.MustParse("00000000-0000-0000-0000-00000000000F")
+
+	f := &models.Event{
+		Type: "a",
+		ID:   myuuid15,
+		Relationships: map[string][]models.Relation{
+			"b": {
+				models.Relation{
+					Type: "c",
+					ID:   myuuid7,
+				},
+
+				models.Relation{
+					Type: "d",
+					ID:   myuuid1,
+				},
+			},
+		},
+	}
+
+	merges := mSmall.Merge(f)
+
+	if len(merges) != 0 {
+		t.Errorf("Merges should contain 0 items but contain %v", len(merges))
+		return
+	}
+
+	merges = mMid.Merge(f)
+
+	if len(merges) != 0 {
+		t.Errorf("Merges should contain 0 items but contain %v", len(merges))
+		return
+	}
+
+	merges = mBig.Merge(f)
+
+	if len(merges) != 1 {
+		t.Errorf("Merges should contain 1 item but contain %v", len(merges))
+		return
+	}
+}
