@@ -20,6 +20,12 @@ type InternalServerError struct {
 	Error string `json:"error"`
 }
 
+func onHealthCheck(c *gin.Context) {
+
+	c.Writer.Write([]byte("hello"))
+	c.Status(200)
+}
+
 func onRequest(c *gin.Context) {
 	var model models.Event
 	err := c.ShouldBindBodyWithJSON(&model)
@@ -45,6 +51,7 @@ func Start(config *configuration.ServerConfiguration, factory factory.EventPoolW
 	ctx, cancel := context.WithCancel(context.Background())
 	eventPool.Initialize(factory, ctx)
 	router := gin.Default()
+	router.GET("/", onHealthCheck)
 	router.POST("/api/event", onRequest)
 	srv := &http.Server{
 		Addr:    config.HttpConfig.Host + ":" + strconv.Itoa(config.HttpConfig.Port),
