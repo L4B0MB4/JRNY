@@ -70,7 +70,6 @@ func (s *SelfConfiguringMerging) linkEverything(items [][16]byte) (merges Merges
 	return merges
 }
 
-// Todo: adjustment for merging -> only notify of a merge when the event-id is within the responsible area
 func (s *SelfConfiguringMerging) getOrAddMerges(to [16]byte, add [16]byte, merges Merges) Merges {
 	found := false
 	for i := 0; i < len(merges); i++ {
