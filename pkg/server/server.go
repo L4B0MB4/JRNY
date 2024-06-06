@@ -3,9 +3,9 @@ package server
 import (
 	"context"
 	"net/http"
-	"os"
 	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 
 	"github.com/L4B0MB4/JRNY/pkg/configuration"
@@ -40,7 +40,7 @@ func onRequest(c *gin.Context) {
 var eventPool = pool.EventPool{}
 
 func Start(config *configuration.ServerConfiguration, factory factory.EventPoolWorkerFactory) {
-	signalCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	signalCtx, stop := signal.NotifyContext(context.Background(), syscall.SIGKILL, syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 	ctx, cancel := context.WithCancel(context.Background())
 	eventPool.Initialize(factory, ctx)
@@ -56,9 +56,7 @@ func Start(config *configuration.ServerConfiguration, factory factory.EventPoolW
 		}
 	}()
 	defer cancel()
-	select {
-	case <-signalCtx.Done():
-	}
+	<-signalCtx.Done()
 	log.Debug().Msg("Shutting down ...")
 	cancel()
 	srv.Shutdown(ctx)
