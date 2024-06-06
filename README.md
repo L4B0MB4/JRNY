@@ -138,6 +138,20 @@ docker run -d -p 8081:8081 --name jrny_server --env RABBITMQ_URL=amqp://guest:gu
 docker run -d --name jrny_consumer --env RABBITMQ_URL=amqp://guest:guest@some-rabbit:5672/ --net jrny_net jrny/consumer
 ```
 
+# K8
+
+## Start
+
+```bash
+kubectl apply -f ./deployment/k8/server_deployment.yml
+```
+
+## Delete
+
+```bash
+kubectl apply -f ./deployment/k8/server_deployment.yml
+```
+
 # Requests
 
 ## Example

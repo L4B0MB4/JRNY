@@ -17,6 +17,7 @@ spec:
       containers:
         - name: jrny-server
           image: jrny/server
+          imagePullPolicy: Never
           resources:
             limits:
               memory: "128M"
@@ -30,12 +31,12 @@ apiVersion: v1
 kind: Service
 metadata:
   name: jrny-server-service
-  labels:
-    app: jrny-server
 spec:
+  type: LoadBalancer
   ports:
-  - port: 8082
+  - port: 8081
     protocol: TCP
     targetPort: 8081
+    nodePort: 30001
   selector:
     app: jrny-server
