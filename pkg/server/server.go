@@ -2,7 +2,9 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
+	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
@@ -21,8 +23,8 @@ type InternalServerError struct {
 }
 
 func onHealthCheck(c *gin.Context) {
-
-	c.Writer.Write([]byte("hello"))
+	d, _ := json.Marshal(os.Environ())
+	c.Writer.Write(d)
 	c.Status(200)
 }
 

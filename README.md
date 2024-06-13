@@ -149,7 +149,7 @@ kubectl apply -f ./deployment/k8/server_deployment.yml
 ## Delete
 
 ```bash
-kubectl apply -f ./deployment/k8/server_deployment.yml
+kubectl delete -f ./deployment/k8/server_deployment.yml
 ```
 
 # Requests
