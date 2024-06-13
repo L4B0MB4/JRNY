@@ -25,7 +25,7 @@ spec:
           ports:
             - containerPort: 8081
 
---- 
+---
 
 apiVersion: v1
 kind: Service
@@ -40,3 +40,62 @@ spec:
     nodePort: 30001
   selector:
     app: jrny-server
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbit-mq-deployment
+  labels:
+    app: rabbit-mq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbit-mq
+  template:
+    metadata:
+      labels:
+        app: rabbit-mq
+    spec:
+      containers:
+        - name: rabbit-mq
+          image: rabbitmq:3-management
+          resources:
+            limits:
+              memory: "1G"
+              cpu: "0.5"
+          ports:
+            - containerPort: 15672
+
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbit-mq-mngmnt-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8080
+    name: management
+    protocol: TCP
+    targetPort: 15672
+    nodePort: 30002
+  selector:
+    app:  rabbit-mq
+
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbit-mq--mqtt-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5672
+    protocol: TCP
+    targetPort: 5672
+    nodePort: 30003
+  selector:
+    app:  rabbit-mq
