@@ -5,7 +5,7 @@ metadata:
   labels:
     app: jrny-server
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: jrny-server
@@ -99,3 +99,29 @@ spec:
     nodePort: 30003
   selector:
     app:  rabbit-mq
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jrny-consumer-deployment
+  labels:
+    app: jrny-consumer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jrny-consumer
+  template:
+    metadata:
+      labels:
+        app: jrny-consumer
+    spec:
+      containers:
+        - name: jrny-consumer
+          image: jrny/consumer
+          imagePullPolicy: Never
+          resources:
+            limits:
+              memory: "128M"
+              cpu: "0.5"

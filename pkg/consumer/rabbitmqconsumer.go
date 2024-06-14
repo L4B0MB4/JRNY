@@ -29,10 +29,21 @@ func (c *RabbitMqConsumer) Initialize() error {
 		log.Error().Err(err).Msg("No config set for consumer")
 		return err
 	}
-
-	conn, err := amqp.Dial(c.Config.QueueConfig.Endpoint)
-	if err != nil {
-		log.Error().Err(err).Msg("Could not connect to rabbitmq host")
+	var conn *amqp.Connection
+	var err error
+	for i := 0; i < 20; i++ {
+		c, err := amqp.Dial(c.Config.QueueConfig.Endpoint)
+		if err != nil {
+			log.Error().Err(err).Msg("Could not connect to rabbitmq host")
+			sleepduration := 500 * time.Millisecond * time.Duration(i)
+			log.Info().Dur("sleepingtime", sleepduration).Msg("Sleeping ...")
+			time.Sleep(sleepduration)
+		} else {
+			conn = c
+			break
+		}
+	}
+	if conn == nil {
 		return err
 	}
 	c.channel, err = conn.Channel()
