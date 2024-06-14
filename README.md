@@ -152,6 +152,45 @@ kubectl apply -f ./deployment/k8/server_deployment.yml
 kubectl delete -f ./deployment/k8/server_deployment.yml
 ```
 
+## Dashboard
+
+### Install
+
+You can install a dashboard from helm with
+
+```bash
+helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+```
+
+And you can create an example user with
+
+```bash
+kubectl apply -f ./deployment/k8/sample-dashboard-user.yml
+```
+
+### Run
+
+To create a token for the user created above use
+
+```bash
+kubectl -n kubernetes-dashboard create token admin-user
+```
+
+And then port forward with
+
+```bash
+kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+```
+
+to make the dashboard available locally
+
+### Delete
+
+```bash
+kubectl delete namespace kubernetes-dashboard
+```
+
 # Requests
 
 ## Example

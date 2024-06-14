@@ -3,6 +3,7 @@ package worker
 import (
 	"bytes"
 	"encoding/gob"
+	"time"
 
 	"github.com/L4B0MB4/JRNY/pkg/helper"
 	"github.com/L4B0MB4/JRNY/pkg/models"
@@ -20,9 +21,20 @@ type RabbitMqEventPoolWorker struct {
 }
 
 func (w *RabbitMqEventPoolWorker) SetUp() {
-	conn, err := amqp.Dial(w.Endpoint)
-	if err != nil {
-		log.Error().Err(err).Msg("Could not connect to rabbitmq host")
+	var conn *amqp.Connection
+	for i := 0; i < 20; i++ {
+		c, err := amqp.Dial(w.Endpoint)
+		if err != nil {
+			log.Error().Err(err).Msg("Could not connect to rabbitmq host")
+			sleepduration := 500 * time.Millisecond * time.Duration(i)
+			log.Info().Dur("sleepingtime", sleepduration).Msg("Sleeping ...")
+			time.Sleep(sleepduration)
+		} else {
+			conn = c
+			break
+		}
+	}
+	if conn == nil {
 		return
 	}
 	ch, err := conn.Channel()
