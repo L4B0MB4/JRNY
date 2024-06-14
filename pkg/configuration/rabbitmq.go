@@ -9,8 +9,8 @@ type RabbitMqConfiguration struct {
 func (c *RabbitMqConfiguration) Default() {
 	url, ok := os.LookupEnv("RABBITMQ_URL")
 	if !ok {
-		url, ok = os.LookupEnv("RABBIT_MQ__MQTT_SERVICE_SERVICE_HOST")
-		port, okPort := os.LookupEnv("RABBIT_MQ__MQTT_SERVICE_SERVICE_PORT")
+		url, ok = os.LookupEnv("RABBIT_MQ_MQTT_SERVICE_SERVICE_HOST")
+		port, okPort := os.LookupEnv("RABBIT_MQ_MQTT_SERVICE_SERVICE_PORT")
 
 		if !ok || !okPort {
 			c.Endpoint = "amqp://guest:guest@localhost:5672/"
