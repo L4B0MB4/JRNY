@@ -34,7 +34,7 @@ func setup() consumer.Consumer {
 		Config: &config,
 		Merger: &merger,
 	}
-
+	consumer.AnnounceAvailablility()
 	return &consumer
 
 }

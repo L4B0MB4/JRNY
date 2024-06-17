@@ -17,3 +17,12 @@ func CreateDefaultQueue(ch *amqp.Channel) error {
 	}
 	return nil
 }
+
+func CreateAvailabliltyQueue(ch *amqp.Channel) error {
+	_, err := ch.QueueDeclare("availablilty", true, false, true, false, nil)
+	if err != nil {
+		log.Error().Err(err).Msg("Could not declare rabbitmq queue")
+		return err
+	}
+	return nil
+}

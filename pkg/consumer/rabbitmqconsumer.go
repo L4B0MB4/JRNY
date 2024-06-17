@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -55,6 +56,10 @@ func (c *RabbitMqConsumer) Initialize() error {
 	if err != nil {
 		return err
 	}
+	err = helper.CreateAvailabliltyQueue(c.channel)
+	if err != nil {
+		return err
+	}
 	c.lifeTimeContext = context.Background() //todo: change to context that is canceled on ctrl-c
 	c.initialized = true
 	return nil
@@ -98,4 +103,27 @@ func (c *RabbitMqConsumer) readMessage(msg amqp.Delivery) {
 
 	c.Merger.Merge(&readEvent)
 	log.Debug().Str("millisecondsToProcess", time.Now().UTC().Sub(readEvent.ReceivedAt).String()).Msg("Finished working on event")
+}
+
+func (c *RabbitMqConsumer) AnnounceAvailablility() {
+
+	available := models.Available{
+		MessageType: models.MessageType{
+			MType: "availablity",
+		},
+	}
+
+	bytes, err := json.Marshal(available)
+	if err != nil {
+		log.Error().Err(err).Msg("Could marshal model")
+		return
+	}
+	err = c.channel.Publish("", "availablity", false, false, amqp.Publishing{
+		ContentType: "application/octet-stream",
+		Body:        bytes,
+	})
+	if err != nil {
+		log.Error().Err(err).Msg("Could not publish available message")
+		return
+	}
 }
